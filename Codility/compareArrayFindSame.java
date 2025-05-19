@@ -56,8 +56,8 @@ public class compareArrayFindSame {
 
     public static void main(String[] args) {
         int A = 12345;
-        int B = 54321;
-        System.out.println("Common digits: " + countCommonDigits(A, B)); // Output: 5
+        int B = 45379;
+        System.out.println("Common digits: " + countCommonDigits(A, B)); 
     }
 
 }
