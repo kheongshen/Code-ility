@@ -1,0 +1,577 @@
+Okay, here are 10 Codility-style questions, along with Java solutions.  I've tried to cover a range of difficulty and common algorithmic topics.  Remember that in a real Codility assessment, performance (time complexity and space complexity) are crucial, and your code will be heavily tested.
+
+**Important Notes:**
+
+*   **Focus on Correctness and Efficiency:**  Prioritize a correct solution first, then analyze its time and space complexity to optimize if necessary.
+*   **Edge Cases:** Always consider edge cases and boundary conditions.  A solution that fails on simple test cases is useless.
+*   **Clarity:** Write clear, well-documented code.  It makes debugging and understanding easier.
+*   **Error Handling:** For simplicity, I have skipped the detailed error handling and validations for the questions in the answers below. But in reality you must consider error handling as well.
+
+**Questions & Answers:**
+
+**1.  Binary Gap**
+
+*   **Problem:**  A binary gap within a positive integer N is any maximal sequence of consecutive zeros that is surrounded by ones at both ends in the binary representation of N. For example, the number 9 has binary representation 1001 and contains a binary gap of length 2. The number 529 has binary representation 1000010001 and contains two binary gaps: one of length 4 and one of length 3. The number 20 has binary representation 10100 and contains one binary gap of length 1. The number 15 has binary representation 1111 and has no binary gaps. Write a function:
+
+    ```java
+    class Solution { public int solution(int N); }
+    ```
+
+    that, given a positive integer N, returns the length of its longest binary gap. The function should return 0 if N doesn't contain a binary gap.  For example, given N = 1041 the function should return 5. Given N = 32 the function should return 0.
+
+*   **Java Solution:**
+
+```java
+class Solution {
+    public int solution(int N) {
+        int maxGap = 0;
+        int currentGap = 0;
+        boolean counting = false;
+
+        String binaryString = Integer.toBinaryString(N);
+
+        for (int i = 0; i < binaryString.length(); i++) {
+            if (binaryString.charAt(i) == '1') {
+                if (counting) {
+                    maxGap = Math.max(maxGap, currentGap);
+                }
+                counting = true;
+                currentGap = 0;
+            } else {
+                if (counting) {
+                    currentGap++;
+                }
+            }
+        }
+
+        return maxGap;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Convert the integer `N` to its binary string representation.
+    2.  Iterate through the binary string.
+    3.  If we encounter a '1', and we're already `counting` a gap, update `maxGap`.  Then, start a new count by resetting `currentGap` to 0 and set `counting` to true.
+    4.  If we encounter a '0' and we're `counting`, increment `currentGap`.
+    5.  Return `maxGap`.
+    *   **Time Complexity:** O(log N) - because the length of the binary string is proportional to the logarithm of N.
+    *   **Space Complexity:** O(log N) - for the binary string.
+
+**2.  Cyclic Rotation**
+
+*   **Problem:**  An array A consisting of N integers is given. Rotation of the array means that each element is shifted right by one index, and the last element of the array is moved to the first place. For example, the rotation of array A = [3, 8, 9, 7, 6] is [6, 3, 8, 9, 7] (elements are shifted right by one index and 6 is moved to the first place). The goal is to rotate array A K times; that is, each element of A will be shifted to the right K times.
+
+    Write a function:
+
+    ```java
+    class Solution { public int[] solution(int[] A, int K); }
+    ```
+
+    that, given an array A consisting of N integers and an integer K, returns the array A rotated K times.
+
+    For example, given
+
+    A = [3, 8, 9, 7, 6]
+    K = 3
+
+    the function should return [9, 7, 6, 3, 8].
+
+*   **Java Solution:**
+
+```java
+class Solution {
+    public int[] solution(int[] A, int K) {
+        int n = A.length;
+
+        if (n == 0) {
+            return A; // Handle empty array case
+        }
+
+        K = K % n; // Optimize K if it's larger than the array length
+
+        int[] rotatedArray = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            rotatedArray[(i + K) % n] = A[i];
+        }
+
+        return rotatedArray;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Handle the edge case of an empty array.
+    2.  Optimize K by taking the modulo (`% n`).  If K is larger than the array length, rotating `K` times is the same as rotating `K % n` times.
+    3.  Create a new array `rotatedArray` to store the result.
+    4.  Iterate through the original array `A`.  For each element at index `i`, place it in the `rotatedArray` at index `(i + K) % n`. The modulo operator ensures that we wrap around the array when necessary.
+    5.  Return the `rotatedArray`.
+
+    *   **Time Complexity:** O(N) - We iterate through the array once.
+    *   **Space Complexity:** O(N) - We create a new array of the same size.  In-place rotation is possible, but more complex to implement correctly.
+
+**3.  Odd Occurrences In Array**
+
+*   **Problem:** A non-empty array A consisting of N integers is given. The array contains an odd number of elements, and each element of the array can be paired with another element that has the same value, except for one element which is left unpaired.
+
+    Write a function:
+
+    ```java
+    class Solution { public int solution(int[] A); }
+    ```
+
+    that, given an array A consisting of N integers fulfilling the above conditions, returns the value of the unpaired element.
+
+    For example, given array A = [9, 3, 9, 3, 9, 7, 9], the function should return 7.
+
+*   **Java Solution:**
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public int solution(int[] A) {
+        Map<Integer, Integer> counts = new HashMap<>();
+
+        for (int num : A) {
+            counts.put(num, counts.getOrDefault(num, 0) + 1);
+        }
+
+        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() % 2 != 0) {
+                return entry.getKey();
+            }
+        }
+
+        return -1; // Should not happen given the problem constraints, but good practice
+    }
+}
+```
+
+*   **Explanation:**
+    1. Use a HashMap to count the occurrences of each number in the array.
+    2. Iterate through the HashMap and find the number with an odd count.
+    *   **Time Complexity:** O(N) - due to iterating through the array.
+    *   **Space Complexity:** O(N) -  In the worst case, all elements are unique, so the HashMap stores N elements.  A bit manipulation approach (using XOR) can achieve O(1) space complexity, but is less intuitive.
+
+**Alternative solution using XOR**
+
+```java
+class Solution {
+    public int solution(int[] A) {
+        int result = 0;
+        for (int num : A) {
+            result ^= num;
+        }
+        return result;
+    }
+}
+```
+
+*   **Explanation:** The XOR operation has the property that `a ^ a = 0` and `a ^ 0 = a`. Therefore, if we XOR all the numbers in the array, the pairs of numbers will cancel each other out, leaving only the unpaired number.
+    *   **Time Complexity:** O(N) - due to iterating through the array.
+    *   **Space Complexity:** O(1) - no extra space is used.
+
+**4.  Frog Jump**
+
+*   **Problem:**  A frog is sitting on the first position of a straight line. The frog wants to get to the position greater than or equal to X. The frog can only jump a fixed distance D.
+
+    Write a function:
+
+    ```java
+    class Solution { public int solution(int X, int Y, int D); }
+    ```
+
+    that, given three integers X, Y and D, returns the minimal number of jumps that the frog must perform to reach a target position greater than or equal to Y.
+
+    For example, given:
+      X = 10
+      Y = 85
+      D = 30
+
+    the function should return 3, because the frog will be positioned as follows:
+
+    *   after the first jump, at position 10 + 30 = 40
+    *   after the second jump, at position 10 + 30 + 30 = 70
+    *   after the third jump, at position 10 + 30 + 30 + 30 = 100
+
+*   **Java Solution:**
+
+```java
+class Solution {
+    public int solution(int X, int Y, int D) {
+        int distance = Y - X;
+        int jumps = distance / D;
+
+        if (distance % D != 0) {
+            jumps++;
+        }
+
+        return jumps;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Calculate the distance the frog needs to cover (`Y - X`).
+    2.  Divide the distance by the jump length `D`. The integer part of the result gives the minimum number of full jumps needed.
+    3.  If there's a remainder ( `distance % D != 0` ), it means the frog needs one more jump to reach or exceed the target position `Y`.
+
+    *   **Time Complexity:** O(1) - Constant time complexity because it only involves a few arithmetic operations.
+    *   **Space Complexity:** O(1) - Constant space complexity because it uses only a few variables.
+
+**5.  Perm Missing Elem**
+
+*   **Problem:** An array A consisting of N different integers is given. The array contains integers in the range [1..(N + 1)], which means that exactly one element is missing.
+
+    Write a function:
+
+    ```java
+    class Solution { public int solution(int[] A); }
+    ```
+
+    that, given an array A, returns the value of the missing element.
+
+    For example, given array A = [2, 3, 1, 5], the function should return 4.
+
+*   **Java Solution:**
+
+```java
+class Solution {
+    public int solution(int[] A) {
+        int n = A.length;
+        long expectedSum = (long) (n + 1) * (n + 2) / 2; // Use long to prevent overflow
+        long actualSum = 0;
+
+        for (int num : A) {
+            actualSum += num;
+        }
+
+        return (int) (expectedSum - actualSum);
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Calculate the expected sum of all numbers from 1 to (N + 1) using the formula `(n + 1) * (n + 2) / 2`.  It's crucial to use `long` to prevent potential integer overflow when N is large.
+    2.  Calculate the actual sum of the elements in the array `A`.
+    3.  The missing element is simply the difference between the expected sum and the actual sum.
+
+    *   **Time Complexity:** O(N) - due to iterating through the array once.
+    *   **Space Complexity:** O(1) -  uses only a few variables.
+
+**6.  Tape Equilibrium**
+
+*   **Problem:** A non-empty array A consisting of N integers is given. Array A represents numbers on a tape.  Any integer P in the range `0 < P < N` splits this tape into two non-empty parts: `A[0], A[1], ..., A[P − 1]` and `A[P], A[P + 1], ..., A[N − 1]`.  The difference between the two parts is the value of: `|(A[0] + A[1] + ... + A[P − 1]) − (A[P] + A[P + 1] + ... + A[N − 1])|`  In other words, it is the absolute difference between the sum of the first part and the sum of the second part.
+
+    Write a function:
+
+    ```java
+    class Solution { public int solution(int[] A); }
+    ```
+
+    that, given a non-empty array A of N integers, returns the minimal difference that can be achieved.
+
+    For example, given array A = [3, 1, 2, 4, 3], the function should return 1.
+
+*   **Java Solution:**
+
+```java
+class Solution {
+    public int solution(int[] A) {
+        int n = A.length;
+        long totalSum = 0;
+        for (int num : A) {
+            totalSum += num;
+        }
+
+        long leftSum = 0;
+        long minDifference = Integer.MAX_VALUE;
+
+        for (int p = 0; p < n - 1; p++) {
+            leftSum += A[p];
+            long rightSum = totalSum - leftSum;
+            long difference = Math.abs(leftSum - rightSum);
+            minDifference = Math.min(minDifference, difference);
+        }
+
+        return (int) minDifference;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Calculate the total sum of all elements in the array.
+    2.  Iterate through possible split points `P` from 0 to `N - 2` (exclusive).
+    3.  Keep track of the `leftSum` (sum of elements to the left of `P`).
+    4.  Calculate the `rightSum` as `totalSum - leftSum`.
+    5.  Calculate the absolute difference between `leftSum` and `rightSum`.
+    6.  Update `minDifference` with the minimum difference found so far.
+
+    *   **Time Complexity:** O(N) - We iterate through the array once.
+    *   **Space Complexity:** O(1) - We use only a few extra variables.
+
+**7. FrogRiverOne**
+
+*   **Problem:** A small frog wants to get to the other side of a river. The frog is currently located at position 0, and wants to get to position X+1. Leaves fall on the river sequentially. You are given an array A consisting of N integers representing the falling leaves. For example, A[K] = 5 means that a leaf falls into position 5 after K seconds. The goal is to find the earliest time when the frog can jump to the other side of the river (i.e. to position X+1). The frog can jump to position X+1 if there is a leaf at each position 1, 2, ..., X (that is, we want to find the earliest moment when all the positions from 1 to X are covered by leaves).
+
+    Write a function:
+
+    ```java
+    class Solution { public int solution(int X, int[] A); }
+    ```
+
+    that, given a non-empty array A consisting of N integers and integer X, returns the earliest time when the frog can jump to the other side of the river.
+
+    If the frog is never able to jump to the other side of the river, the function should return -1.
+
+    For example, given X = 5 and A = [1, 3, 1, 4, 2, 3, 5, 4], the function should return 6.
+
+*   **Java Solution:**
+
+```java
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public int solution(int X, int[] A) {
+        Set<Integer> coveredPositions = new HashSet<>();
+
+        for (int i = 0; i < A.length; i++) {
+            if (A[i] <= X) {
+                coveredPositions.add(A[i]);
+            }
+
+            if (coveredPositions.size() == X) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Use a `HashSet` to keep track of the positions that are covered by leaves.
+    2.  Iterate through the array `A`.
+    3.  For each leaf position `A[i]`, if it's within the range `1` to `X`, add it to the `coveredPositions` set.
+    4.  If the size of the `coveredPositions` set becomes equal to `X`, it means all positions from 1 to X are covered, so return the current index `i`.
+    5.  If the loop finishes without finding all positions covered, return -1.
+
+    *   **Time Complexity:** O(N) -  We iterate through the array once.  HashSet operations (add, size) are typically O(1) on average.
+    *   **Space Complexity:** O(X) - In the worst case, the HashSet stores all positions from 1 to X.
+
+**8. Max Counters**
+
+*   **Problem:** You are given N counters, initially set to 0, and you have two possible operations on them:
+
+    *   increase(X) − counter X is increased by 1,
+    *   max counter − all counters are set to the maximum value of any counter.
+
+    A non-empty array A of M integers is given. This array represents consecutive operations:
+
+    *   if A[K] = X + 1, such that 1 ≤ X ≤ N, then operation K is increase(X),
+    *   if A[K] = N + 1 then operation K is max counter.
+
+    For example, given integer N = 5 and array A = [3, 4, 4, 6, 1, 4, 4], the values of the counters after each consecutive operation will be:
+
+    *   (0, 0, 1, 0, 0)
+    *   (0, 0, 1, 1, 0)
+    *   (0, 0, 1, 2, 0)
+    *   (2, 2, 2, 2, 2)
+    *   (3, 2, 2, 2, 2)
+    *   (3, 2, 2, 3, 2)
+    *   (3, 2, 2, 4, 2)
+
+    The goal is to calculate the value of every counter after all operations.
+
+    Write a function:
+
+    ```java
+    class Solution { public int[] solution(int N, int[] A); }
+    ```
+
+    that, given an integer N and a non-empty array A consisting of M integers, returns a sequence of integers representing the values of the counters.
+
+    Result array should be returned as an array of integers.
+
+    For example, given:
+
+    N = 5
+    A = [3, 4, 4, 6, 1, 4, 4]
+
+    the function should return [3, 2, 2, 4, 2].
+
+*   **Java Solution:**
+
+```java
+class Solution {
+    public int[] solution(int N, int[] A) {
+        int[] counters = new int[N];
+        int maxCounter = 0;
+        int lastUpdate = 0;  //Keeps track of the last "max counter" value
+
+        for (int operation : A) {
+            if (operation >= 1 && operation <= N) {
+                int index = operation - 1;
+                counters[index] = Math.max(counters[index], lastUpdate); // Apply previous max counter
+                counters[index]++;
+                maxCounter = Math.max(maxCounter, counters[index]);
+            } else if (operation == N + 1) {
+                lastUpdate = maxCounter;
+            }
+        }
+
+        // Final update: Apply the last "max counter" to any counters that haven't reached it
+        for (int i = 0; i < N; i++) {
+            counters[i] = Math.max(counters[i], lastUpdate);
+        }
+
+        return counters;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Initialize an array `counters` of size `N` with all elements set to 0.
+    2.  `maxCounter` keeps track of the overall maximum value of any counter.
+    3.  `lastUpdate` remembers the value that was last used when a "max counter" operation was performed.  This avoids repeatedly setting all counters to the maximum value during a "max counter" operation.
+    4.  Iterate through the array `A` of operations:
+        *   If the operation is an `increase(X)` operation ( `1 <= operation <= N`):
+            *   Apply the effect of the previous "max counter" by setting `counters[index]` to the maximum of its current value and `lastUpdate`.
+            *   Increment the counter at the corresponding index.
+            *   Update `maxCounter` if the incremented counter is larger.
+        *   If the operation is a "max counter" operation ( `operation == N + 1`):
+            *   Update `lastUpdate` with the current value of `maxCounter`.
+    5.  After processing all operations, iterate through the `counters` array again.  For any counter that is still less than `lastUpdate`, set it to `lastUpdate`.  This handles the case where a counter was never explicitly increased after a "max counter" operation.
+
+    *   **Time Complexity:** O(N + M) - We iterate through `A` once (O(M)), and the `counters` array once at the end (O(N)).
+    *   **Space Complexity:** O(N) - We create the `counters` array of size `N`.
+
+**9.  Missing Integer**
+
+*   **Problem:** Write a function:
+
+    ```java
+    class Solution { public int solution(int[] A); }
+    ```
+
+    that, given an array A of N integers, returns the smallest positive integer (greater than 0) that does not occur in A.
+
+    For example, given A = [1, 3, 6, 4, 1, 2], the function should return 5.
+
+    Given A = [1, 2, 3], the function should return 4.
+
+    Given A = [−1, −3], the function should return 1.
+
+*   **Java Solution:**
+
+```java
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public int solution(int[] A) {
+        Set<Integer> seen = new HashSet<>();
+        for (int num : A) {
+            seen.add(num);
+        }
+
+        int i = 1;
+        while (seen.contains(i)) {
+            i++;
+        }
+
+        return i;
+    }
+}
+```
+
+*   **Explanation:**
+    1.  Create a `HashSet` called `seen` to store all the numbers present in the array `A`.
+    2.  Iterate through the array `A` and add each number to the `seen` set.
+    3.  Start with `i = 1` (the smallest positive integer).
+    4.  While the `seen` set contains `i`, increment `i`.
+    5.  Return `i`. This is the smallest positive integer not present in the array.
+
+    *   **Time Complexity:** O(N) - We iterate through the array `A` once to build the `seen` set.  The `contains` operation on a `HashSet` is typically O(1) on average.  The `while` loop will, in the worst case, iterate up to N+1 times.
+    *   **Space Complexity:** O(N) - In the worst case, the `seen` set stores all unique elements of the array, which could be up to N elements.
+
+**10. Triangle**
+
+*   **Problem:** An array A consisting of N integers is given. A triplet (P, Q, R) is triangular if 0 ≤ P < Q < R < N and:
+
+    *   A[P] + A[Q] > A[R],
+    *   A[Q] + A[R] > A[P],
+    *   A[R] + A[P] > A[Q].
+
+    For example, consider array A such that:
+
+      A[0] = 10    A[1] = 2    A[2] = 5
+      A[3] = 1     A[4] = 8    A[5] = 20
+
+    Triplet (0, 2, 4) is triangular.
+
+    Write a function:
+
+    ```java
+    class Solution { public int solution(int[] A); }
+    ```
+
+    that, given an array A consisting of N integers, returns 1 if there exists a triangular triplet for this array and returns 0 otherwise.
+
+    For example, given array A such that:
+
+      A[0] = 10    A[1] = 2    A[2] = 5
+      A[3] = 1     A[4] = 8    A[5] = 20
+
+    the function should return 1, as explained above.
+
+    Given array A such that:
+
+      A[0] = 10    A[1] = 50    A[2] = 5
+      A[3] = 1
+
+    the function should return 0.
+
+*   **Java Solution:**
+
+```java
+import java.util.Arrays;
+
+class Solution {
+    public int solution(int[] A) {
+        int n = A.length;
+        if (n < 3) {
+            return 0;  // Not enough elements for a triplet
+        }
+
+        Arrays.sort(A);
+
+        for (int i = 0; i < n - 2; i++) {
+            //Using long to avoid overflow issues
+            if ((long) A[i] + A[i + 1] > A[i + 2]) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+}
+```
+
+*   **Explanation:**
+
+    1.  Handle the edge case where the array has fewer than 3 elements.  A triangle requires at least 3 vertices.
+    2.  Sort the array `A` in ascending order.
+    3.  Iterate through the array from index 0 to `n - 3`.  For each index `i`, check if the triplet `(i, i + 1, i + 2)` forms a triangle.
+    4.  Because the array is sorted, we only need to check the condition `A[i] + A[i + 1] > A[i + 2]`.  The other two triangle inequality conditions are automatically satisfied by the sorted order: `A[i + 1] + A[i + 2] > A[i]` and `A[i + 2] + A[i] > A[i + 1]`.  **Crucially, use `long` for the addition to prevent integer overflow.**
+
+    *   **Time Complexity:** O(N log N) - Dominated by the sorting step (Arrays.sort).
+    *   **Space Complexity:** O(1) - Sort is done in place, using constant extra space.  Note that some sort implementations can have O(log N) space.
+
+These solutions are designed to be correct and reasonably efficient.  Remember to carefully consider edge cases and optimize for performance if necessary in a real Codility assessment.  Good luck!
+
